@@ -15,17 +15,18 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import red.emption.Cnst;
 import red.emption.Hud.Hud;
 import red.emption.Redemption;
-import red.emption.entities.Background;
-import red.emption.entities.Bg;
 import red.emption.entities.Ship;
+import red.emption.entities.asteroid;
+import red.emption.managers.BackgroundManager;
 import red.emption.managers.GameKeys;
 import red.emption.noise.SimplexNoise;
+import red.emption.physics.first;
 import red.emption.shade;
 
 public class GameScreen implements Screen {
     SimplexNoise simplexNoise;
     Redemption redemption;
-    Bg bg;
+    BackgroundManager backgroundManager;
     Ship ship;
     Hud hud;
     shade Shade;
@@ -41,6 +42,9 @@ public class GameScreen implements Screen {
 
     //tets
     Texture tex;
+    asteroid ast;
+    first first1;
+    first first2;
 
 
     public GameScreen(Redemption redemption){
@@ -57,6 +61,9 @@ public class GameScreen implements Screen {
         Shade = new shade(redemption);
 
 
+        ast = new asteroid();
+
+
         tex = redemption.loader.th;
         cam = new OrthographicCamera();
         view = new FitViewport(w,h,cam);
@@ -65,9 +72,12 @@ public class GameScreen implements Screen {
         s = new ShaderProgram(redemption.loader.vert,redemption.loader.frag);
 
         batch = new SpriteBatch();
+        backgroundManager = new BackgroundManager(redemption);
         hud = new Hud(redemption,batch);
-        bg = new Bg(redemption);
-        bg.generateStars();
+        first1 = new first(ship.x, ship.y);
+        first2 = new first(ship.x+150, ship.y);
+
+
 //        Gdx.input.setInputProcessor(hud.getStage());
 
 
@@ -92,13 +102,18 @@ public class GameScreen implements Screen {
         s.setUniformi("u_texture",0);
         s.setUniformMatrix("u_projTrans",cam.combined);
         ship.drawThrust(s);
+        ast.begin(cam.combined);
+        ast.forPoint((int) ship.x, (int) ship.y);
+        ast.draw();
+        ast.end();
 //        System.out.println((float) simplexNoise.noise(cam.position.x,cam.position.y));
 //        cam.update();
 //        ship.update(delta);
 
         batch.begin();
         batch.setProjectionMatrix(cam.combined);
-        bg.drawStars(batch);
+
+        backgroundManager.draw(batch);
 //        batch.draw(tex,0,0,w,h);
         ship.draw(batch);
 
@@ -109,7 +124,23 @@ public class GameScreen implements Screen {
 //
 //        }
         //batch.draw(bg.getTex(),ship.x,ship.y);
+        first1.draw(batch);
+        first1.move(delta);
+        if (GameKeys.isDown(GameKeys.LEFT)){
+            first1.rotate(-delta);
+        } else if (GameKeys.isDown(GameKeys.RIGHT)) {
+            first1.rotate(delta);
 
+        }
+        if (GameKeys.isDown(GameKeys.SPACE)){
+            first1.setVel(100);
+        }
+//        else first1.setVel(0);
+        first1.checkCollision(first2);
+        first2.draw(batch);
+        first2.move(delta);
+        first2.setMass(5);
+//        first2.checkCollision(first1);
         batch.end();
 
 //        batch.setProjectionMatrix(hud.getStage().getCamera().combined); //set the spriteBatch to draw what our stageViewport sees
@@ -122,15 +153,16 @@ public class GameScreen implements Screen {
 
     private void update(float dt) {
         if(GameKeys.isPressed(GameKeys.SPACE)){
-            System.out.println(ship.getX()+" "+bg.getOriginX());
+            System.out.println(ship.getX()+" ");
         }
         handleinput();
         ship.update(dt);
         cam.position.set(MathUtils.lerp(cam.position.x,ship.x,2*dt),MathUtils.lerp(cam.position.y,ship.y,2*dt),0);
         cam.update();
-        if ((w/2)+ship.getX()>bg.getOriginX()+2*w){
-            bg.update((int) (bg.getOriginX()+w), (int) (bg.getOriginY()));
-        }
+        backgroundManager.manageBG((int)ship.getX(), (int) ship.getY());
+//        if ((w/2)+ship.getX()>bg.getOriginX()+2*w){
+//            bg.update((int) (bg.getOriginX()+w), (int) (bg.getOriginY()));
+//        }
 
     }
 
@@ -165,7 +197,7 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         batch.dispose();
-        bg.dispose();
+        backgroundManager.dispose();
         s.dispose();
 
     }

@@ -42,11 +42,11 @@ public class Ship {
     }
 
     public float getX() {
-        return shipSprite.getX();
+        return this.x;
     }
 
     public float getY() {
-        return shipSprite.getY();
+        return this.y;
     }
 
     public void setLeft(boolean left) {

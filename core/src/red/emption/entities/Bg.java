@@ -25,8 +25,22 @@ public class Bg {
         starTexture = red.loader.starTex;
     }
 
+//    generateStars only generates if OriginX+w > OriginX || OriginY+w > OriginY
+//    to-do make methods to generate for OriginX+w " < " OriginX || OriginY+w " < " OriginY
+    public void generateStars_greaterX(){
+
+    }
+    public void generateStars_greaterY(){
+
+    }
+    public void generateStars_lessX(){
+
+    }
+    public void generateStars_lessY(){
+
+    }
     public void generateStars(){
-        for (int i = OriginX;i < OriginX+(2*w);i+=32){
+        for (int i = OriginX;i < OriginX+(w);i+=32){
             for (int j = OriginY; j < OriginY+w; j+=32){
                 double n = SimplexNoise.noise(i,j);
 //                double n = NoiseGeneretor.noise(i*0.1,j*0.1); //n>0.5
@@ -62,7 +76,7 @@ public class Bg {
 //        }
         stars.clear();
         generateStars();
-        System.out.println(w+" ");
+
     }
     public void drawStars(SpriteBatch batch){
         if (!stars.isEmpty()){

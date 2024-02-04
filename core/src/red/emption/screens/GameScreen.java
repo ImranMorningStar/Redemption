@@ -18,6 +18,7 @@ import red.emption.Redemption;
 import red.emption.entities.Background;
 import red.emption.entities.Bg;
 import red.emption.entities.Ship;
+import red.emption.managers.BackgroundManager;
 import red.emption.managers.GameKeys;
 import red.emption.noise.SimplexNoise;
 import red.emption.shade;
@@ -25,7 +26,7 @@ import red.emption.shade;
 public class GameScreen implements Screen {
     SimplexNoise simplexNoise;
     Redemption redemption;
-    Bg bg;
+    BackgroundManager backgroundManager;
     Ship ship;
     Hud hud;
     shade Shade;
@@ -65,9 +66,10 @@ public class GameScreen implements Screen {
         s = new ShaderProgram(redemption.loader.vert,redemption.loader.frag);
 
         batch = new SpriteBatch();
+        backgroundManager = new BackgroundManager(redemption);
         hud = new Hud(redemption,batch);
-        bg = new Bg(redemption);
-        bg.generateStars();
+
+
 //        Gdx.input.setInputProcessor(hud.getStage());
 
 
@@ -98,7 +100,7 @@ public class GameScreen implements Screen {
 
         batch.begin();
         batch.setProjectionMatrix(cam.combined);
-        bg.drawStars(batch);
+        backgroundManager.draw(batch);
 //        batch.draw(tex,0,0,w,h);
         ship.draw(batch);
 
@@ -122,15 +124,16 @@ public class GameScreen implements Screen {
 
     private void update(float dt) {
         if(GameKeys.isPressed(GameKeys.SPACE)){
-            System.out.println(ship.getX()+" "+bg.getOriginX());
+            System.out.println(ship.getX()+" ");
         }
         handleinput();
         ship.update(dt);
         cam.position.set(MathUtils.lerp(cam.position.x,ship.x,2*dt),MathUtils.lerp(cam.position.y,ship.y,2*dt),0);
         cam.update();
-        if ((w/2)+ship.getX()>bg.getOriginX()+2*w){
-            bg.update((int) (bg.getOriginX()+w), (int) (bg.getOriginY()));
-        }
+        backgroundManager.manageBG((int)ship.getX(), (int) ship.getY());
+//        if ((w/2)+ship.getX()>bg.getOriginX()+2*w){
+//            bg.update((int) (bg.getOriginX()+w), (int) (bg.getOriginY()));
+//        }
 
     }
 
@@ -165,7 +168,7 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         batch.dispose();
-        bg.dispose();
+        backgroundManager.dispose();
         s.dispose();
 
     }

@@ -16,6 +16,7 @@ import red.emption.Cnst;
 import red.emption.Hud.Hud;
 import red.emption.Redemption;
 import red.emption.entities.Background;
+import red.emption.entities.Bg;
 import red.emption.entities.Ship;
 import red.emption.managers.GameKeys;
 import red.emption.noise.SimplexNoise;
@@ -24,7 +25,7 @@ import red.emption.shade;
 public class GameScreen implements Screen {
     SimplexNoise simplexNoise;
     Redemption redemption;
-    Background bg;
+    Bg bg;
     Ship ship;
     Hud hud;
     shade Shade;
@@ -54,8 +55,7 @@ public class GameScreen implements Screen {
 
         ship = new Ship(redemption);
         Shade = new shade(redemption);
-        bg = new Background();
-        bg.setNumStars((int)w);
+
 
         tex = redemption.loader.th;
         cam = new OrthographicCamera();
@@ -66,6 +66,8 @@ public class GameScreen implements Screen {
 
         batch = new SpriteBatch();
         hud = new Hud(redemption,batch);
+        bg = new Bg(redemption);
+        bg.generateStars();
 //        Gdx.input.setInputProcessor(hud.getStage());
 
 
@@ -96,7 +98,7 @@ public class GameScreen implements Screen {
 
         batch.begin();
         batch.setProjectionMatrix(cam.combined);
-        bg.render(batch);
+        bg.drawStars(batch);
 //        batch.draw(tex,0,0,w,h);
         ship.draw(batch);
 
@@ -119,10 +121,16 @@ public class GameScreen implements Screen {
     }
 
     private void update(float dt) {
+        if(GameKeys.isPressed(GameKeys.SPACE)){
+            System.out.println(ship.getX()+" "+bg.getOriginX());
+        }
         handleinput();
         ship.update(dt);
         cam.position.set(MathUtils.lerp(cam.position.x,ship.x,2*dt),MathUtils.lerp(cam.position.y,ship.y,2*dt),0);
         cam.update();
+        if ((w/2)+ship.getX()>bg.getOriginX()+2*w){
+            bg.update((int) (bg.getOriginX()+w), (int) (bg.getOriginY()));
+        }
 
     }
 
@@ -157,6 +165,7 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         batch.dispose();
+        bg.dispose();
         s.dispose();
 
     }

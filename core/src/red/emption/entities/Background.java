@@ -24,6 +24,7 @@ public class Background {
     ArrayList<Sprite> stars = new ArrayList<>();
     Pixmap pmp1,pmp2;
     int w = (int) Cnst.width,h = (int) Cnst.height;
+    int OriginX=0,OriginY=0;
     Texture tex;
     SimplexNoise simplexNoise;
     private int numStars;
@@ -53,34 +54,51 @@ public class Background {
         this.numStars = numStars;
     }
 
-    public void generateStars(){
 
-//        Random random = new Random();
-//        vertices = new float[numStars*2];
-//        vertices[0]=0;
-//        vertices[1]=0;
-        for (int i = numStars-w ; i <numStars;i+=16){
-            for (int j = numStars-w ; j < numStars; j+=16){
-                if (SimplexNoise.noise(i,j)>0.9){
+    public void generateStars(){
+        for (int i = OriginX;i < OriginX+w;i+=16){
+            for (int j = OriginY; j < OriginY+w; j+=16){
+                if (SimplexNoise.noise(i,j) > 0.9){
                     Sprite star = new Sprite(tex);
                     star.setPosition(i,j);
                     stars.add(star);
-//                    verx.add((float)i);
-//                    very.add((float)j);
-//                    vertices[vertices.length-2]=i;
-//                    vertices[vertices.length-1]=j;
                 }
             }
-//            vertices[i]= (float) SimplexNoise.noise(i,i)*1000;
-////                    random.nextFloat()*1000;
-//            vertices[i+1]= (float) SimplexNoise.noise(i=1,i+1)*1000;
-////                    random.nextFloat()*1000;
-
         }
-//        verticesBuffer = BufferUtils.newFloatBuffer(vertices.length);
-//        verticesBuffer.put(vertices);
-//        verticesBuffer.flip();
     }
+
+    public int getOriginX() {
+        return OriginX;
+    }
+
+    public int getOriginY() {
+        return OriginY;
+    }
+
+    public void update(int x, int y){
+        this.OriginX=x;
+        this.OriginY=y;
+        stars.clear();
+        generateStars();
+    }
+    public void drawStars(SpriteBatch batch){
+        if (!stars.isEmpty()){
+            for (Sprite star : stars){
+                star.draw(batch);
+            }
+        }
+    }
+//    public void generateStars(){
+//        for (int i = numStars-w ; i <numStars;i+=16){
+//            for (int j = numStars-w ; j < numStars; j+=16){
+//                if (SimplexNoise.noise(i,j)>0.9){
+//                    Sprite star = new Sprite(tex);
+//                    star.setPosition(i,j);
+//                    stars.add(star);
+//                }
+//            }
+//        }
+//    }
     public void render(SpriteBatch batch){
 //        Gdx.app.log("gen","run");
         if(GameKeys.isPressed(GameKeys.SPACE)){

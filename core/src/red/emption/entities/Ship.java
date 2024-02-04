@@ -16,7 +16,7 @@ public class Ship {
     Redemption redemption;
     float w = Cnst.width;
     float h = Cnst.height;
-    public float maxSpeed,accn,dccn,accTimer,rotSpeed,rad,dx,dy,x,y,spw=0,sph=0;
+    public float maxSpeed,accn,dccn,accTimer,rotSpeed,rad,dx,dy,x=0,y=0,spw=0,sph=0;
     public  boolean up,down,left,right;
 
     newThrust nth;
@@ -42,11 +42,11 @@ public class Ship {
     }
 
     public float getX() {
-        return x;
+        return shipSprite.getX();
     }
 
     public float getY() {
-        return y;
+        return shipSprite.getY();
     }
 
     public void setLeft(boolean left) {
